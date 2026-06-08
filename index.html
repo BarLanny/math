@@ -1,14 +1,862 @@
-        /**
-         * 5. מחולל השאלות הרב-נושאי (Dynamic Multi-Topic Engine)
-         * עודכן: רמה קלה עשויה קצת יותר קשה!
-         */
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>הרפתקת המתמטיקה של בר</title>
+    <style>
+        :root {
+            --bg-jungle: #E8F5E9;
+            --primary-green: #4CAF50;
+            --dino-orange: #FF9800;
+            --dino-purple: #9C27B0;
+            --sky-blue: #00BCD4;
+            --accent-red: #E91E63;
+            --gold-coin: #FFD700;
+            --text-dark: #1B5E20;
+            --text-light: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --border-radius: 24px;
+            --box-shadow: 0 12px 0px rgba(46, 125, 50, 0.15);
+            --btn-shadow: 0 8px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-jungle);
+            color: #1B5E20;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* סרגל HUD עליון קבוע */
+        .hud-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            border: 4px solid #C8E6C9;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #F1F8E9;
+            padding: 6px 12px;
+            border-radius: 50px;
+            border: 2px solid #C8E6C9;
+        }
+
+        /* רכיב הדינוזאור המלווה האינטראקטיבי */
+        .dino-companion-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #E8F5E9;
+            border: 4px dashed var(--primary-green);
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: float 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-6px); }
+        }
+
+        .dino-avatar {
+            font-size: 3.5rem;
+            background: var(--card-bg);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50px;
+            border: 4px solid var(--dino-orange);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .dino-speech-bubble {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: 16px;
+            position: relative;
+            font-weight: bold;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 2px solid #C8E6C9;
+        }
+
+        .dino-speech-bubble::after {
+            content: '';
+            position: absolute;
+            top: 50%; right: -10px;
+            transform: translateY(-50%) rotate(45deg);
+            width: 15px; height: 15px;
+            background: var(--card-bg);
+            border-left: 2px solid #C8E6C9;
+            border-bottom: 2px solid #C8E6C9;
+        }
+
+        /* ניהול תצוגת מסכים */
+        .app-view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .app-view.view-active {
+            display: flex;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 22px 20px;
+            box-shadow: var(--box-shadow);
+            border: 4px solid #C8E6C9;
+            text-align: center;
+        }
+
+        h1.main-title {
+            font-size: 2.8rem;
+            color: var(--primary-green);
+            text-shadow: 3px 3px 0px var(--gold-coin);
+            font-weight: 900;
+        }
+
+        h2.section-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #1B5E20;
+        }
+
+        /* כפתורי תלת-ממד */
+        .btn-3d {
+            background-color: var(--primary-green);
+            color: var(--text-light);
+            border: none;
+            padding: 14px 24px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: var(--btn-shadow), inset 0 -4px 0px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0px rgba(0,0,0,0.15), inset 0 -2px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-orange { background-color: var(--dino-orange); }
+        .btn-purple { background-color: var(--dino-purple); }
+        .btn-blue { background-color: var(--sky-blue); }
+        .btn-red { background-color: var(--accent-red); }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 10px 0;
+        }
+
+        .toggle-box {
+            background: #F1F8E9;
+            border: 3px solid #C8E6C9;
+            padding: 12px;
+            border-radius: 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-box.selected-box {
+            background: var(--gold-coin);
+            border-color: var(--dino-orange);
+            transform: scale(1.02);
+            color: #E65100;
+        }
+
+        /* בידוד מוחלט לתצוגת מתמטיקה LTR */
+        .math-display-wrapper {
+            background: #263238;
+            border-radius: 20px;
+            padding: 24px 15px;
+            margin: 10px 0;
+            box-shadow: inset 0 6px 0px rgba(0,0,0,0.3);
+            border: 4px solid var(--dino-orange);
+        }
+
+        .math-forced-ltr {
+            direction: ltr !important;
+            unicode-bidi: bidi-override !important;
+            display: inline-block;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #00E676;
+            letter-spacing: 2px;
+        }
+
+        .math-forced-ltr span.fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 2rem;
+            margin: 0 4px;
+        }
+        .math-forced-ltr span.fraction span.num { display: block; border-bottom: 3px solid #00E676; padding: 0 2px; }
+        .math-forced-ltr span.fraction span.den { display: block; padding: 0 2px; }
+
+        /* פאנל 4 אפשרויות בחירה */
+        .choices-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn-choice {
+            background: #FFFFFF;
+            border: 4px solid #C8E6C9;
+            padding: 14px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0px #C8E6C9;
+            direction: ltr;
+        }
+
+        .btn-choice:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0px #C8E6C9;
+        }
+
+        /* פאנל מקלדת נומרית מובנית */
+        .keypad-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 300px;
+            margin: 15px auto 0 auto;
+        }
+
+        .btn-key {
+            background: #F1F8E9;
+            border: 3px solid #C8E6C9;
+            padding: 12px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #CBD5E1;
+        }
+
+        .input-preview-box {
+            background: #FFFFFF;
+            border: 3px dashed var(--sky-blue);
+            padding: 8px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-radius: 16px;
+            min-height: 50px;
+            direction: ltr;
+        }
+
+        /* שעון עצר קווי לשאלה */
+        .progress-bar-container {
+            width: 100%;
+            height: 14px;
+            background: #E0E0E0;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-top: 8px;
+            border: 2px solid #BDBDBD;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to left, var(--primary-green), var(--accent-red));
+            transition: width 0.1s linear;
+        }
+
+        /* מסך משוב חגיגי */
+        .feedback-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feedback-dino {
+            font-size: 6rem;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); } to { transform: translateY(-20px); }
+        }
+
+        .feedback-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin: 15px 0;
+        }
+
+        .bonus-badge {
+            background: var(--dino-orange);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--gold-coin);
+            margin-top: 10px;
+        }
+
+        /* לוח ביצועים וסטטיסטיקות */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: #F1F8E9;
+            border: 2px solid #C8E6C9;
+            padding: 12px;
+            border-radius: 16px;
+        }
+
+        .stat-num {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary-green);
+        }
+
+        .achievements-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .achievement-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #F5F5F5;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border-right: 6px solid #BDBDBD;
+            opacity: 0.6;
+            text-align: right;
+        }
+
+        .achievement-row.unlocked {
+            background: #FFFDE7;
+            border-right-color: var(--gold-coin);
+            opacity: 1;
+        }
+
+        .bars-wrapper {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 100px;
+            margin-top: 15px;
+            border-bottom: 3px solid #C8E6C9;
+        }
+
+        .bar-node {
+            width: 35px;
+            background: var(--sky-blue);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            min-height: 5px;
+        }
+
+        .bar-node::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -22px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #2E7D32;
+        }
+
+        /* סרגל ניווט תחתון */
+        .nav-bar {
+            background: var(--card-bg);
+            border-top: 4px solid #C8E6C9;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            z-index: 90;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #757575;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .nav-item.nav-active {
+            color: var(--primary-green);
+        }
+
+        .nav-item span:first-child { font-size: 1.4rem; }
+
+        #toast-alert {
+            position: fixed;
+            top: 15px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            z-index: 1000;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-alert"></div>
+
+    <div id="feedback-panel" class="feedback-overlay">
+        <div id="feedback-dino-node" class="feedback-dino">🦖</div>
+        <div id="feedback-state" class="feedback-title">כל הכבוד!</div>
+        <div id="feedback-solution" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 8px;"></div>
+        <div id="feedback-msg" style="font-size: 1.1rem; color: #555;"></div>
+        <div id="feedback-bonus-container"></div>
+    </div>
+
+    <div class="app-container">
+
+        <header class="hud-banner">
+            <div class="hud-item">⭐ כוכבים: <span id="hud-stars">0</span></div>
+            <div class="hud-item">🪙 מטבעות: <span id="hud-coins">0</span></div>
+            <div class="hud-item">🔥 רצף: <span id="hud-streak">0</span></div>
+        </header>
+
+        <section class="dino-companion-container">
+            <div id="global-dino-avatar" class="dino-avatar">🦖</div>
+            <div class="dino-speech-bubble" id="global-dino-speech">
+                שלום חבר! מוכן להרפתקת מתמטיקה מטורפת בג'ונגל? בחר רמה ונושאים ונתחיל לרוץ!
+            </div>
+        </section>
+
+        <main id="view-home" class="app-view view-active">
+            <div class="game-card">
+                <h1 class="main-title">Math4FUN</h1>
+                <p style="font-weight: bold; color: #558B2F;">מחסירים את ה-3 ונשארים תמיד מספר 1!</p>
+            </div>
+
+            <div class="game-card">
+                <h2 class="section-title">1. בחר רמת קושי 🚀</h2>
+                <div class="selection-grid">
+                    <div class="toggle-box selected-box" data-type="tier" data-value="easy" onclick="DinoSystem.say('רמה קלה מעולה להתחלה מהירה!')">קל 🎯</div>
+                    <div class="toggle-box" data-type="tier" data-value="medium" onclick="DinoSystem.say('רמה בינונית! מחכים לנו אתגרים מעניינים!')">בינוני 💪</div>
+                    <div class="toggle-box" data-type="tier" data-value="hard" onclick="DinoSystem.say('וואו, רמה קשה! אתה אמיץ מאוד!')">קשה 🔥</div>
+                    <div class="toggle-box" data-type="tier" data-value="master" onclick="DinoSystem.say('רמת מאסטר המטורפת! רק למומחים אמיתיים!')">מאסטר 👑</div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <h2 class="section-title">2. בחר נושאי לימוד (ניתן לבחור כמה!) 📝</h2>
+                <div class="selection-grid" id="topics-selection-box"></div>
+                <button class="btn-3d btn-blue" style="font-size:1rem; padding:8px 16px; margin-top:10px;" onclick="toggleSelectAllTopics()">בחר את כל הנושאים</button>
+            </div>
+
+            <div class="game-card">
+                <h2 class="section-title">3. בחר סוג משחק ומשך 🎲</h2>
+                <div class="selection-grid">
+                    <div class="toggle-box selected-box" data-type="mode" data-value="time">משחק זמן ⏱️</div>
+                    <div class="toggle-box" data-type="mode" data-value="count">משחק שאלות 📝</div>
+                </div>
+
+                <div id="time-options-container" style="margin-top: 12px;">
+                    <p style="font-weight: bold; margin-bottom: 6px;">משך זמן המשחק:</p>
+                    <div class="selection-grid" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="toggle-box selected-box" style="padding: 8px 2px; font-size: 0.9rem;" data-type="duration" data-value="120">2 דק'</div>
+                        <div class="toggle-box" style="padding: 8px 2px; font-size: 0.9rem;" data-type="duration" data-value="180">3 דק'</div>
+                        <div class="toggle-box" style="padding: 8px 2px; font-size: 0.9rem;" data-type="duration" data-value="300">5 דק'</div>
+                        <div class="toggle-box" style="padding: 8px 2px; font-size: 0.9rem;" data-type="duration" data-value="600">10 דק'</div>
+                    </div>
+                </div>
+
+                <div id="count-options-container" style="margin-top: 12px; display: none;">
+                    <p style="font-weight: bold; margin-bottom: 6px;">כמות שאלות קבועה:</p>
+                    <div class="selection-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="toggle-box selected-box" data-type="qcount" data-value="10">10 שאלות</div>
+                        <div class="toggle-box" data-type="qcount" data-value="20">20 שאלות</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-3d btn-orange" style="width: 100%; margin-top: 10px; font-size: 1.4rem;" onclick="GameEngine.startSession()">צא לדרך! הרפתקה ממתינה 🦕⚔️</button>
+        </main>
+
+        <main id="view-game" class="app-view">
+            <div class="game-card" style="padding: 12px 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
+                    <div id="game-mode-status-text">נותר זמן: 00:00</div>
+                    <div>ניקוד: <span id="live-score">0</span></div>
+                    <div>שאלה: <span id="live-index">1</span></div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="q-timer-bar" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="math-display-wrapper">
+                    <div id="math-expression-node" class="math-forced-ltr"></div>
+                </div>
+                <p id="word-problem-text" style="color: var(--dino-purple); font-weight: bold; margin-top: 5px; font-size: 1.1rem; display: none;"></p>
+            </div>
+
+            <div class="game-card" id="input-zone-root">
+                <div id="panel-choices" class="choices-layout" style="display: none;">
+                    <button class="btn-choice" onclick="GameEngine.submitAnswer(this.innerText)">0</button>
+                    <button class="btn-choice" onclick="GameEngine.submitAnswer(this.innerText)">0</button>
+                    <button class="btn-choice" onclick="GameEngine.submitAnswer(this.innerText)">0</button>
+                    <button class="btn-choice" onclick="GameEngine.submitAnswer(this.innerText)">0</button>
+                </div>
+
+                <div id="panel-keypad" style="display: none;">
+                    <div id="keypad-preview" class="input-preview-box">?</div>
+                    <div class="keypad-layout">
+                        <button class="btn-key" onclick="GameEngine.pressKey('1')">1</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('2')">2</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('3')">3</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('4')">4</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('5')">5</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('6')">6</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('7')">7</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('8')">8</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('9')">9</button>
+                        <button class="btn-key" style="background:#FFCDD2;" onclick="GameEngine.pressKey('clear')">C</button>
+                        <button class="btn-key" onclick="GameEngine.pressKey('0')">0</button>
+                        <button class="btn-key" style="background:#C8E6C9;" onclick="GameEngine.pressKey('enter')">✓</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-3d btn-red" style="width: 100%;" onclick="GameEngine.exitEarly()">עצור וברח למסך הבית ↩️</button>
+        </main>
+
+        <main id="view-results" class="app-view">
+            <div class="game-card" style="background: linear-gradient(to bottom, #FFF, #E8F5E9);">
+                <h2 class="section-title" style="font-size: 2rem; color: var(--primary-green);">הסיבוב הסתיים! 🏆</h2>
+                <p style="font-weight: bold; font-size: 1.1rem; color: #E65100; margin-bottom: 12px;" id="redirect-countdown-msg">העברה אוטומטית למסך הבית בעוד 6 שניות...</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">💥 ניקוד סופי<br><span class="stat-num" id="r-score">0</span></div>
+                    <div class="stat-card">🎯 דיוק מהלך<br><span class="stat-num" id="r-acc">0%</span></div>
+                    <div class="stat-card">⭐ כוכבים<br><span class="stat-num" id="r-stars">0</span></div>
+                    <div class="stat-card">🪙 מטבעות<br><span class="stat-num" id="r-coins">0</span></div>
+                    <div class="stat-card">✅ נכונות<br><span class="stat-num" id="r-good">0</span></div>
+                    <div class="stat-card">❌ שגויות<br><span class="stat-num" id="r-bad">0</span></div>
+                    <div class="stat-card" style="grid-column: span 2;">⚡ בונוס מהירות שנצבר: <span id="r-speedbonus" style="font-weight:bold; color:var(--dino-orange);">0</span></div>
+                </div>
+
+                <div id="r-records-holder" style="margin-top: 12px; display: none;"></div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="btn-3d btn-orange" style="flex: 1;" onclick="GameEngine.startSession()">שחק שוב 🔄</button>
+                    <button class="btn-3d" style="flex: 1; background-color: #757575;" onclick="NavigationSystem.changeTab('home')">חזור הביתה 🏠</button>
+                </div>
+            </div>
+        </main>
+
+        <main id="view-stats" class="app-view">
+            <div class="game-card">
+                <h2 class="section-title">יומן המסע המתמטי שלי 📊</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">🎮 משחקים<br><span class="stat-num" id="s-games">0</span></div>
+                    <div class="stat-card">📝 שאלות<br><span class="stat-num" id="s-questions">0</span></div>
+                    <div class="stat-card">🎯 דיוק כללי<br><span class="stat-num" id="s-acc">0%</span></div>
+                    <div class="stat-card">⚡ זמן תגובה<br><span class="stat-num" id="s-time">0 ש'</span></div>
+                    <div class="stat-card">👑 שיא נקודות<br><span class="stat-num" id="s-high">0</span></div>
+                    <div class="stat-card">🪙 קופה<br><span class="stat-num" id="s-coins">0</span></div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <h2 class="section-title">גרף פתרונות חודשי 📈</h2>
+                <p style="font-size: 0.85rem; color: #555; font-weight: bold; margin-bottom: 8px;">כמות שאלות נכונות לפי שבועות האפליקציה:</p>
+                <div class="bars-wrapper">
+                    <div id="bar-w1" class="bar-node" style="height: 10%;" data-label="שבוע 1"></div>
+                    <div id="bar-w2" class="bar-node" style="height: 10%;" data-label="שבוע 2"></div>
+                    <div id="bar-w3" class="bar-node" style="height: 10%;" data-label="שבוע 3"></div>
+                    <div id="bar-w4" class="bar-node" style="height: 10%;" data-label="שבוע 4"></div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <h2 class="section-title">עיטורים ומדליות ג'ונגל 🏆</h2>
+                <div class="achievements-box" id="achievements-list"></div>
+            </div>
+        </main>
+
+        <main id="view-settings" class="app-view">
+            <div class="game-card">
+                <h2 class="section-title">הגדרות סאונד ומוזיקה ⚙️</h2>
+                <div style="display: flex; flex-direction: column; gap: 15px; text-align: right; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #F1F8E9; padding: 12px; border-radius: 12px;">
+                        <span style="font-weight: bold;">🎵 מוזיקת רקע הרפתקנית</span>
+                        <input type="checkbox" id="setting-music" checked style="width:22px; height:22px;" onchange="SoundManager.syncSettings()">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #F1F8E9; padding: 12px; border-radius: 12px;">
+                        <span style="font-weight: bold;">🔊 אפקטים קוליים (SFX)</span>
+                        <input type="checkbox" id="setting-sfx" checked style="width:22px; height:22px;" onchange="SoundManager.syncSettings()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <h2 class="section-title" style="color: var(--accent-red);">איפוס הרפתקה ⚠️</h2>
+                <button class="btn-3d btn-red" style="width: 100%;" onclick="Database.clearProgress()">מחק את כל ההיסטוריה וההישגים</button>
+            </div>
+        </main>
+
+        <nav class="nav-bar" id="bottom-navigation-bar">
+            <button class="nav-item nav-active" onclick="NavigationSystem.changeTab('home')">
+                <span>🏠</span><span>בית</span>
+            </button>
+            <button class="nav-item" onclick="NavigationSystem.changeTab('stats')">
+                <span>📊</span><span>יומן מסע</span>
+            </button>
+            <button class="nav-item" onclick="NavigationSystem.changeTab('settings')">
+                <span>⚙️</span><span>הגדרות</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        const Database = (() => {
+            const STORAGE_KEY = "MATH4FUN_DINO_PROD_DB_V2";
+            
+            let schema = {
+                stars: 0,
+                coins: 0,
+                highScore: 0,
+                totalGames: 0,
+                totalQuestions: 0,
+                totalCorrect: 0,
+                durationSpent: 0,
+                streak: 0,
+                unlockedBadges: [],
+                weeklyProgress: [0, 0, 0, 0],
+                settings: { music: true, sfx: true }
+            };
+
+            const load = () => {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if(raw) {
+                    try { schema = JSON.parse(raw); } catch(e) { console.error("DB Corrupted, reset."); }
+                }
+                return schema;
+            };
+
+            const save = () => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(schema));
+                updateHUDBanner();
+            };
+
+            const get = () => schema;
+
+            const clearProgress = () => {
+                if(confirm("האם ברצונך לאפס את כל התקדמות המשחק שלך? דקסטר יתעצב מאוד!")) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    window.location.reload();
+                }
+            };
+
+            return { load, save, get, clearProgress };
+        })();
+
+        const SoundManager = (() => {
+            let audioCtx = null;
+            let musicInterval = null;
+
+            const initCtx = () => {
+                if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            };
+
+            const playTone = (freq, type, duration, delay = 0) => {
+                const db = Database.get();
+                if(!db.settings.sfx) return;
+                setTimeout(() => {
+                    try {
+                        initCtx();
+                        let osc = audioCtx.createOscillator();
+                        let gain = audioCtx.createGain();
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + duration);
+                    } catch(e){}
+                }, delay);
+            };
+
+            const playSuccess = () => {
+                playTone(523.25, 'sine', 0.1, 0);
+                playTone(659.25, 'sine', 0.1, 80);
+                playTone(783.99, 'sine', 0.2, 160);
+            };
+
+            const playError = () => {
+                playTone(220, 'triangle', 0.15, 0);
+                playTone(180, 'triangle', 0.25, 100);
+            };
+
+            const playClick = () => { playTone(440, 'sine', 0.04, 0); };
+
+            const syncSettings = () => {
+                const db = Database.get();
+                db.settings.music = document.getElementById('setting-music').checked;
+                db.settings.sfx = document.getElementById('setting-sfx').checked;
+                Database.save();
+                
+                if(!db.settings.music) {
+                    clearInterval(musicInterval);
+                    musicInterval = null;
+                } else {
+                    startAmbientMusic();
+                }
+            };
+
+            const startAmbientMusic = () => {
+                const db = Database.get();
+                if (!db.settings.music || musicInterval) return;
+                musicInterval = setInterval(() => {
+                    if (Database.get().settings.music) {
+                        playTone(261.63, 'sine', 0.1, 0);
+                        playTone(329.63, 'sine', 0.1, 300);
+                    }
+                }, 1500);
+            };
+
+            return { playSuccess, playError, playClick, syncSettings, startAmbientMusic };
+        })();
+
+        const DinoSystem = (() => {
+            const dinoFaces = { happy: '🦖', excited: '🦕', surprised: '🐊', sad: '🐢' };
+            
+            const say = (text, mood = 'happy') => {
+                const avatar = dinoFaces[mood] || '🦖';
+                document.getElementById('global-dino-avatar').innerText = avatar;
+                document.getElementById('global-dino-speech').innerText = text;
+            };
+
+            return { say };
+        })();
+
+        const NavigationSystem = (() => {
+            const changeTab = (viewId) => {
+                SoundManager.playClick();
+                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('view-active'));
+                
+                const activeView = document.getElementById(`view-${viewId}`);
+                if(activeView) activeView.classList.add('view-active');
+
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
+                
+                const bottomNav = document.getElementById('bottom-navigation-bar');
+                if(viewId === 'game' || viewId === 'results') {
+                    bottomNav.style.display = 'none';
+                } else {
+                    bottomNav.style.display = 'flex';
+                }
+
+                if(viewId === 'stats') renderStatsDashboard();
+                if(viewId === 'home') DinoSystem.say("אני מוכן! בחר רמה ונושאים ונצא לדרך!", 'excited');
+            };
+
+            return { changeTab };
+        })();
+
         const QuestionGenerator = (() => {
             const generate = (tier, selectedTopics) => {
                 let topic = selectedTopics[Math.floor(Math.random() * selectedTopics.length)];
                 let num1 = 0, num2 = 0, answer = 0, expr = "", wordProblem = "";
                 
-                // עודכן: הגברת הקושי ברמה קלה בעדינות
-                let maxVal = 12;  // הוגבר מ-10 ל-12 (עדיין קל, אך קצת יותר קשה)
+                let maxVal = 10;
                 if (tier === 'medium') maxVal = 50;
                 if (tier === 'hard') maxVal = 100;
                 if (tier === 'master') maxVal = 500;
@@ -18,22 +866,20 @@
 
                 switch(topic) {
                     case 'add':
+                        if(tier === 'easy') num1 = Math.floor(Math.random() * 12) + 2;
                         answer = num1 + num2;
                         expr = `${num1} + ${num2} = ?`;
                         break;
                     case 'sub':
+                        if(tier === 'easy') num1 = Math.floor(Math.random() * 12) + 2;
                         if(num1 < num2) { let t = num1; num1 = num2; num2 = t; }
                         answer = num1 - num2;
                         expr = `${num1} - ${num2} = ?`;
                         break;
                     case 'mul':
-                        // עודכן: הגברת הקושי - מספרים גדולים קצת יותר ברמה קלה
-                        if (tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 9) + 2;   // 2-10
-                            num2 = Math.floor(Math.random() * 9) + 2;   // 2-10
-                        } else {
-                            num1 = Math.floor(Math.random() * 10) + 2;
-                            num2 = Math.floor(Math.random() * 10) + 2;
+                        if(tier === 'easy') {
+                            num1 = Math.floor(Math.random() * 9) + 2;
+                            num2 = Math.floor(Math.random() * 9) + 2;
                         }
                         answer = num1 * num2;
                         expr = `${num1} × ${num2} = ?`;
@@ -46,33 +892,18 @@
                         expr = `${num1} ÷ ${num2} = ?`;
                         break;
                     case 'fractions':
-                        // עודכן: שברים קצת יותר קשים ברמה קלה
-                        if (tier === 'easy') {
-                            expr = `<span class="fraction"><span class="num">1</span><span class="den">4</span></span> + <span class="fraction"><span class="num">2</span><span class="den">4</span></span> = ?`;
-                            answer = 3;
-                        } else {
-                            expr = `<span class="fraction"><span class="num">1</span><span class="den">3</span></span> + <span class="fraction"><span class="num">1</span><span class="den">3</span></span> = ?`;
-                            answer = 2;
-                        }
-                        wordProblem = "רשמו את המונה של התשובה הסופית";
+                        expr = `<span class="fraction"><span class="num">1</span><span class="den">4</span></span> + <span class="fraction"><span class="num">2</span><span class="den">4</span></span> = ?`;
+                        answer = 3;
+                        wordProblem = "רשמו את המונה של התשובה הסופית (מתוך 4)";
                         break;
                     case 'percentages':
-                        if (tier === 'easy') {
-                            answer = 20;
-                            expr = `20% × 100 = ?`;
-                            wordProblem = "כמה הם 20 אחוזים מתוך המספר 100?";
-                        } else {
-                            answer = 15;
-                            expr = `15% × 100 = ?`;
-                            wordProblem = "כמה הם 15 אחוזים מתוך המספר 100?";
-                        }
+                        answer = 20;
+                        expr = `20% × 100 = ?`;
+                        wordProblem = "כמה הם 20 אחוזים מתוך המספר 100?";
                         break;
                     case 'geometry':
-                        if (tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 6) + 3;   // 3-8
-                            num2 = Math.floor(Math.random() * 4) + 2;   // 2-5
-                        } else {
-                            num1 = Math.floor(Math.random() * 8) + 3;
+                        if(tier === 'easy') {
+                            num1 = Math.floor(Math.random() * 6) + 3;
                             num2 = Math.floor(Math.random() * 4) + 2;
                         }
                         answer = num1 * num2;
@@ -80,39 +911,25 @@
                         wordProblem = `חשבו את שטח המלבן שאורכו ${num1} ס"מ ורוחבו ${num2} ס"מ:`;
                         break;
                     case 'circle':
-                        if (tier === 'easy') {
-                            answer = 12;  // קטן קצת מ-14
-                            expr = `R = 6 → D = ?`;
-                            wordProblem = "אם רדיוס המעגל הוא 6 ס\"מ, מהו קוטר המעגל?";
-                        } else {
-                            answer = 14;
-                            expr = `R = 7 → D = ?`;
-                            wordProblem = "אם רדיוס המעגל הוא 7 ס\"מ, מהו קוטר המעגל?";
-                        }
+                        answer = 14;
+                        expr = `R = 7 → D = ?`;
+                        wordProblem = "אם רדיוס המעגל הוא 7 ס\"מ, מהו קוטר המעגל?";
                         break;
                     case 'variables':
-                        if (tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 10) + 5;   // 5-14
-                            answer = Math.floor(Math.random() * 4) + 1;  // 1-4
-                        } else {
-                            num1 = Math.floor(Math.random() * 15) + 5;
-                            answer = Math.floor(Math.random() * 5) + 1;
+                        if(tier === 'easy') {
+                            num1 = Math.floor(Math.random() * 10) + 5;
+                            answer = Math.floor(Math.random() * 4) + 1;
                         }
                         expr = `${num1} - X = ${num1 - answer}`;
                         wordProblem = "מצאו את ערכו של הנעלם X:";
                         break;
                     case 'powers':
-                        if (tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 3) + 2;   // 2-4
-                            answer = num1 * num1;
-                            expr = `${num1}² = ?`;
-                            wordProblem = `מהי התוצאה של המספר ${num1} בריבוע?`;
-                        } else {
-                            num1 = Math.floor(Math.random() * 5) + 2;
-                            answer = num1 * num1;
-                            expr = `${num1}² = ?`;
-                            wordProblem = `מהי התוצאה של המספר ${num1} בריבוע?`;
+                        if(tier === 'easy') {
+                            num1 = Math.floor(Math.random() * 3) + 2;
                         }
+                        answer = num1 * num1;
+                        expr = `${num1}² = ?`;
+                        wordProblem = `מהי התוצאה של המספר ${num1} בריבוע?`;
                         break;
                     case 'word_problems':
                         answer = num1 + num2;
@@ -132,3 +949,360 @@
 
             return { generate };
         })();
+
+        const GameEngine = (() => {
+            let state = {
+                tier: 'easy',
+                mode: 'time',
+                duration: 120,
+                qcount: 10,
+                score: 0,
+                correct: 0,
+                total: 0,
+                currentAnswer: 0,
+                startTime: 0,
+                inputMethod: 'choice',
+                buffer: "",
+                selectedTopics: [],
+                speedBonusTotal: 0
+            };
+
+            let globalTimer = null;
+            let questionTimer = null;
+            let redirectTimer = null;
+            let qTimeRemaining = 20;
+
+            const startSession = () => {
+                if (redirectTimer) clearInterval(redirectTimer);
+                SoundManager.playClick();
+                SoundManager.startAmbientMusic();
+
+                state.tier = document.querySelector('[data-type="tier"].selected-box').getAttribute('data-value');
+                state.mode = document.querySelector('[data-type="mode"].selected-box').getAttribute('data-value');
+                state.duration = parseInt(document.querySelector('[data-type="duration"].selected-box').getAttribute('data-value'));
+                state.qcount = parseInt(document.querySelector('[data-type="qcount"].selected-box').getAttribute('data-value'));
+                
+                state.selectedTopics = [];
+                document.querySelectorAll('.topic-box.selected-box').forEach(box => {
+                    state.selectedTopics.push(box.getAttribute('data-value'));
+                });
+
+                if(state.selectedTopics.length === 0) {
+                    alert("בבקשה בחר לפחות נושא לימוד אחד כדי להתחיל במשחק!");
+                    return;
+                }
+
+                state.score = 0;
+                state.correct = 0;
+                state.total = 0;
+                state.speedBonusTotal = 0;
+                state.buffer = "";
+                state.startTime = Date.now();
+
+                loadNextQuestion();
+                NavigationSystem.changeTab('game');
+                startGlobalTimer();
+            };
+
+            const loadNextQuestion = () => {
+                state.total++;
+                const q = QuestionGenerator.generate(state.tier, state.selectedTopics);
+                state.currentAnswer = q.answer;
+                state.inputMethod = q.inputMethod;
+
+                document.getElementById('math-expression-node').innerHTML = q.expr;
+                const wordProblemEl = document.getElementById('word-problem-text');
+                if(q.wordProblem) {
+                    wordProblemEl.innerText = q.wordProblem;
+                    wordProblemEl.style.display = 'block';
+                } else {
+                    wordProblemEl.style.display = 'none';
+                }
+
+                document.getElementById('live-index').innerText = state.total;
+                state.buffer = "";
+                qTimeRemaining = 20;
+
+                renderInputMethod();
+            };
+
+            const renderInputMethod = () => {
+                const choicesPanel = document.getElementById('panel-choices');
+                const keypadPanel = document.getElementById('panel-keypad');
+
+                if (state.inputMethod === 'choice') {
+                    choicesPanel.style.display = 'grid';
+                    keypadPanel.style.display = 'none';
+
+                    let choices = [state.currentAnswer];
+                    while (choices.length < 4) {
+                        let fake = state.currentAnswer + Math.floor(Math.random() * 20) - 10;
+                        if (fake !== state.currentAnswer && !choices.includes(fake) && fake > 0) {
+                            choices.push(fake);
+                        }
+                    }
+                    choices.sort(() => Math.random() - 0.5);
+
+                    const buttons = document.querySelectorAll('.btn-choice');
+                    buttons.forEach((btn, idx) => {
+                        btn.innerText = choices[idx];
+                    });
+                } else {
+                    choicesPanel.style.display = 'none';
+                    keypadPanel.style.display = 'block';
+                    document.getElementById('keypad-preview').innerText = state.buffer || "?";
+                }
+            };
+
+            const startGlobalTimer = () => {
+                if (state.mode !== 'time') return;
+                let remaining = state.duration;
+                globalTimer = setInterval(() => {
+                    remaining--;
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    document.getElementById('game-mode-status-text').innerText =
+                        `נותר זמן: ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+
+                    if (remaining <= 0) {
+                        clearInterval(globalTimer);
+                        endSession();
+                    }
+                }, 1000);
+            };
+
+            const submitAnswer = (ansStr) => {
+                const ans = parseInt(ansStr);
+                if (ans === state.currentAnswer) {
+                    state.correct++;
+                    const speedBonus = Math.max(0, qTimeRemaining - 5);
+                    state.speedBonusTotal += speedBonus;
+                    state.score += 10 + speedBonus;
+                    SoundManager.playSuccess();
+                    showFeedback(true, state.currentAnswer);
+                } else {
+                    SoundManager.playError();
+                    showFeedback(false, state.currentAnswer, ans);
+                }
+                setTimeout(() => {
+                    if (state.mode === 'count' && state.total >= state.qcount) {
+                        endSession();
+                    } else {
+                        loadNextQuestion();
+                    }
+                }, 1500);
+            };
+
+            const pressKey = (key) => {
+                SoundManager.playClick();
+                if (key === 'clear') {
+                    state.buffer = "";
+                } else if (key === 'enter') {
+                    submitAnswer(state.buffer || "0");
+                    return;
+                } else {
+                    if (state.buffer.length < 4) state.buffer += key;
+                }
+                document.getElementById('keypad-preview').innerText = state.buffer || "?";
+            };
+
+            const showFeedback = (isCorrect, correctAns, userAns = null) => {
+                const panel = document.getElementById('feedback-panel');
+                const dinoNode = document.getElementById('feedback-dino-node');
+                const stateNode = document.getElementById('feedback-state');
+                const msgNode = document.getElementById('feedback-msg');
+                const bonusContainer = document.getElementById('feedback-bonus-container');
+
+                if (isCorrect) {
+                    dinoNode.innerText = '🦖';
+                    stateNode.innerText = 'נכון! 🎉';
+                    stateNode.style.color = '#4CAF50';
+                    msgNode.innerText = 'אתה מחלומות!';
+                    bonusContainer.innerHTML = '';
+                } else {
+                    dinoNode.innerText = '🐢';
+                    stateNode.innerText = 'לא בדיוק...';
+                    stateNode.style.color = '#E91E63';
+                    msgNode.innerText = `התשובה הנכונה היא ${correctAns}`;
+                    bonusContainer.innerHTML = '';
+                }
+
+                panel.style.display = 'flex';
+                setTimeout(() => { panel.style.display = 'none'; }, 1200);
+            };
+
+            const endSession = () => {
+                if (globalTimer) clearInterval(globalTimer);
+                const db = Database.get();
+                const acc = Math.round((state.correct / state.total) * 100) || 0;
+                const stars = acc >= 80 ? 3 : acc >= 60 ? 2 : acc >= 40 ? 1 : 0;
+                const coins = state.correct * 5;
+
+                db.totalGames++;
+                db.totalQuestions += state.total;
+                db.totalCorrect += state.correct;
+                db.durationSpent += (Date.now() - state.startTime) / 1000;
+                db.coins += coins;
+                db.stars += stars;
+                if (state.score > db.highScore) db.highScore = state.score;
+
+                Database.save();
+
+                document.getElementById('r-score').innerText = state.score;
+                document.getElementById('r-acc').innerText = acc + '%';
+                document.getElementById('r-stars').innerText = stars;
+                document.getElementById('r-coins').innerText = coins;
+                document.getElementById('r-good').innerText = state.correct;
+                document.getElementById('r-bad').innerText = state.total - state.correct;
+                document.getElementById('r-speedbonus').innerText = state.speedBonusTotal;
+
+                NavigationSystem.changeTab('results');
+                redirectTimer = setInterval(() => {
+                    let countDown = 6;
+                    setInterval(() => {
+                        if (countDown <= 0) {
+                            NavigationSystem.changeTab('home');
+                            clearInterval(redirectTimer);
+                        } else {
+                            document.getElementById('redirect-countdown-msg').innerText =
+                                `העברה אוטומטית למסך הבית בעוד ${countDown} שניות...`;
+                            countDown--;
+                        }
+                    }, 1000);
+                }, 100);
+            };
+
+            const exitEarly = () => {
+                if (confirm("רוצה לצאת מהמשחק? נתונים לא יישמרו!")) {
+                    if (globalTimer) clearInterval(globalTimer);
+                    NavigationSystem.changeTab('home');
+                }
+            };
+
+            return { startSession, submitAnswer, pressKey, exitEarly, loadNextQuestion, renderInputMethod };
+        })();
+
+        const TopicSystem = (() => {
+            const topics = [
+                { key: 'add', label: 'חיבור ➕' },
+                { key: 'sub', label: 'חיסור ➖' },
+                { key: 'mul', label: 'כפל ✖️' },
+                { key: 'div', label: 'חילוק ➗' },
+                { key: 'fractions', label: 'שברים 📊' },
+                { key: 'percentages', label: 'אחוזים 🎯' },
+                { key: 'geometry', label: 'גיאומטריה 📐' },
+                { key: 'circle', label: 'עיגול ⭕' },
+                { key: 'variables', label: 'משתנים ❓' },
+                { key: 'powers', label: 'חזקות ⚡' },
+                { key: 'word_problems', label: 'בעיות מילוליות 📖' }
+            ];
+
+            const renderTopics = () => {
+                const container = document.getElementById('topics-selection-box');
+                container.innerHTML = '';
+                topics.forEach(t => {
+                    const box = document.createElement('div');
+                    box.className = 'toggle-box topic-box selected-box';
+                    box.setAttribute('data-value', t.key);
+                    box.innerText = t.label;
+                    box.onclick = () => {
+                        box.classList.toggle('selected-box');
+                    };
+                    container.appendChild(box);
+                });
+            };
+
+            return { renderTopics };
+        })();
+
+        const updateHUDBanner = () => {
+            const db = Database.get();
+            document.getElementById('hud-stars').innerText = db.stars;
+            document.getElementById('hud-coins').innerText = db.coins;
+            document.getElementById('hud-streak').innerText = db.streak;
+        };
+
+        const renderStatsDashboard = () => {
+            const db = Database.get();
+            const avgTime = db.totalQuestions > 0 ? (db.durationSpent / db.totalQuestions).toFixed(1) : 0;
+            const generalAcc = db.totalQuestions > 0 ? Math.round((db.totalCorrect / db.totalQuestions) * 100) : 0;
+
+            document.getElementById('s-games').innerText = db.totalGames;
+            document.getElementById('s-questions').innerText = db.totalQuestions;
+            document.getElementById('s-acc').innerText = generalAcc + '%';
+            document.getElementById('s-time').innerText = avgTime + ' ש\'';
+            document.getElementById('s-high').innerText = db.highScore;
+            document.getElementById('s-coins').innerText = db.coins;
+
+            const badges = [
+                { icon: '🌟', text: 'מתחיל חדש - 1 משחק' },
+                { icon: '🎯', text: 'דיוק מושלם - 100% סיבוב אחד' },
+                { icon: '⭐', text: 'כוכב זוהר - 50 כוכבים' },
+                { icon: '🏆', text: 'אלוף המתמטיקה - 1000 נקודות' },
+                { icon: '🔥', text: 'רצף של 10 נכונות' }
+            ];
+
+            const achievementsBox = document.getElementById('achievements-list');
+            achievementsBox.innerHTML = '';
+            badges.forEach((badge, idx) => {
+                const row = document.createElement('div');
+                row.className = 'achievement-row';
+                const shouldUnlock = (idx === 0 && db.totalGames > 0) ||
+                                    (idx === 1 && generalAcc === 100) ||
+                                    (idx === 2 && db.stars >= 50) ||
+                                    (idx === 3 && db.highScore >= 1000) ||
+                                    (idx === 4 && db.streak >= 10);
+                if (shouldUnlock) row.classList.add('unlocked');
+                row.innerText = `${badge.icon} ${badge.text}`;
+                achievementsBox.appendChild(row);
+            });
+
+            const weeks = [25, 42, 15, 8];
+            weeks.forEach((val, i) => {
+                const bar = document.getElementById(`bar-w${i+1}`);
+                bar.style.height = (Math.min(val, 100)) + '%';
+            });
+        };
+
+        const toggleSelectAllTopics = () => {
+            const boxes = document.querySelectorAll('.topic-box');
+            const allSelected = Array.from(boxes).every(b => b.classList.contains('selected-box'));
+            boxes.forEach(b => {
+                b.classList[allSelected ? 'remove' : 'add']('selected-box');
+            });
+        };
+
+        (() => {
+            Database.load();
+            updateHUDBanner();
+            TopicSystem.renderTopics();
+            SoundManager.startAmbientMusic();
+
+            document.querySelectorAll('[data-type="mode"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-type="mode"]').forEach(b => b.classList.remove('selected-box'));
+                    this.classList.add('selected-box');
+                    const isTiming = this.getAttribute('data-value') === 'time';
+                    document.getElementById('time-options-container').style.display = isTiming ? 'block' : 'none';
+                    document.getElementById('count-options-container').style.display = isTiming ? 'none' : 'block';
+                });
+            });
+
+            document.querySelectorAll('[data-type="tier"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-type="tier"]').forEach(b => b.classList.remove('selected-box'));
+                    this.classList.add('selected-box');
+                });
+            });
+
+            document.querySelectorAll('[data-type="duration"], [data-type="qcount"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    document.querySelectorAll(`[data-type="${type}"]`).forEach(b => b.classList.remove('selected-box'));
+                    this.classList.add('selected-box');
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
