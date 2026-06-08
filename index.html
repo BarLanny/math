@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>הרפתקת המתמטיקה של בר</title>
+    <title>Math4FUN-3=1 | הרפתקת המתמטיקה של דקסטר</title>
     <style>
         :root {
             --bg-jungle: #E8F5E9;
@@ -524,7 +524,7 @@
                 <h2 class="section-title">1. בחר רמת קושי 🚀</h2>
                 <div class="selection-grid">
                     <div class="toggle-box selected-box" data-type="tier" data-value="easy" onclick="DinoSystem.say('רמה קלה מעולה להתחלה מהירה!')">קל 🎯</div>
-                    <div class="toggle-box" data-type="tier" data-value="medium" onclick="DinoSystem.say('רמה בינונית! מחכים לנו אתגרים מעניינים!')">בינוני 💪</div>
+                    <div class="toggle-box" data-type="tier" data-value="medium" onclick="DinoSystem.say('רמה בינונית! מחכים לנו אתגרים מעניינים!')">בינוני 🧠</div>
                     <div class="toggle-box" data-type="tier" data-value="hard" onclick="DinoSystem.say('וואו, רמה קשה! אתה אמיץ מאוד!')">קשה 🔥</div>
                     <div class="toggle-box" data-type="tier" data-value="master" onclick="DinoSystem.say('רמת מאסטר המטורפת! רק למומחים אמיתיים!')">מאסטר 👑</div>
                 </div>
@@ -626,7 +626,7 @@
                     <div class="stat-card">🪙 מטבעות<br><span class="stat-num" id="r-coins">0</span></div>
                     <div class="stat-card">✅ נכונות<br><span class="stat-num" id="r-good">0</span></div>
                     <div class="stat-card">❌ שגויות<br><span class="stat-num" id="r-bad">0</span></div>
-                    <div class="stat-card" style="grid-column: span 2;">⚡ בונוס מהירות שנצבר: <span id="r-speedbonus" style="font-weight:bold; color:var(--dino-orange);">0</span></div>
+                    <div class="stat-card" style="grid-column: span 2;">⚡ בונוס מהירות שנצבר: <span id="r-speedbonus" style="font-weight:bold; color:var(--dino-orange);">0</span> נק'</div>
                 </div>
 
                 <div id="r-records-holder" style="margin-top: 12px; display: none;"></div>
@@ -704,6 +704,9 @@
     </div>
 
     <script>
+        /**
+         * 1. מערכת ניהול בסיס הנתונים המקומי
+         */
         const Database = (() => {
             const STORAGE_KEY = "MATH4FUN_DINO_PROD_DB_V2";
             
@@ -746,6 +749,9 @@
             return { load, save, get, clearProgress };
         })();
 
+        /**
+         * 2. מערכת השמע הסינתטית
+         */
         const SoundManager = (() => {
             let audioCtx = null;
             let musicInterval = null;
@@ -815,6 +821,9 @@
             return { playSuccess, playError, playClick, syncSettings, startAmbientMusic };
         })();
 
+        /**
+         * 3. מערכת הדינוזאור המלווה
+         */
         const DinoSystem = (() => {
             const dinoFaces = { happy: '🦖', excited: '🦕', surprised: '🐊', sad: '🐢' };
             
@@ -827,6 +836,9 @@
             return { say };
         })();
 
+        /**
+         * 4. מערכת ניווט טאבים
+         */
         const NavigationSystem = (() => {
             const changeTab = (viewId) => {
                 SoundManager.playClick();
@@ -851,6 +863,9 @@
             return { changeTab };
         })();
 
+        /**
+         * 5. מחולל השאלות הרב-נושאי (Dynamic Multi-Topic Engine)
+         */
         const QuestionGenerator = (() => {
             const generate = (tier, selectedTopics) => {
                 let topic = selectedTopics[Math.floor(Math.random() * selectedTopics.length)];
@@ -866,21 +881,17 @@
 
                 switch(topic) {
                     case 'add':
-                        if(tier === 'easy') num1 = Math.floor(Math.random() * 12) + 2;
                         answer = num1 + num2;
                         expr = `${num1} + ${num2} = ?`;
                         break;
                     case 'sub':
-                        if(tier === 'easy') num1 = Math.floor(Math.random() * 12) + 2;
                         if(num1 < num2) { let t = num1; num1 = num2; num2 = t; }
                         answer = num1 - num2;
                         expr = `${num1} - ${num2} = ?`;
                         break;
                     case 'mul':
-                        if(tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 9) + 2;
-                            num2 = Math.floor(Math.random() * 9) + 2;
-                        }
+                        num1 = Math.floor(Math.random() * 10) + 2;
+                        num2 = Math.floor(Math.random() * 10) + 2;
                         answer = num1 * num2;
                         expr = `${num1} × ${num2} = ?`;
                         break;
@@ -902,10 +913,8 @@
                         wordProblem = "כמה הם 20 אחוזים מתוך המספר 100?";
                         break;
                     case 'geometry':
-                        if(tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 6) + 3;
-                            num2 = Math.floor(Math.random() * 4) + 2;
-                        }
+                        num1 = Math.floor(Math.random() * 8) + 3;
+                        num2 = Math.floor(Math.random() * 4) + 2;
                         answer = num1 * num2;
                         expr = `S = ${num1} × ${num2}`;
                         wordProblem = `חשבו את שטח המלבן שאורכו ${num1} ס"מ ורוחבו ${num2} ס"מ:`;
@@ -916,17 +925,13 @@
                         wordProblem = "אם רדיוס המעגל הוא 7 ס\"מ, מהו קוטר המעגל?";
                         break;
                     case 'variables':
-                        if(tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 10) + 5;
-                            answer = Math.floor(Math.random() * 4) + 1;
-                        }
+                        num1 = Math.floor(Math.random() * 15) + 5;
+                        answer = Math.floor(Math.random() * 5) + 1;
                         expr = `${num1} - X = ${num1 - answer}`;
                         wordProblem = "מצאו את ערכו של הנעלם X:";
                         break;
                     case 'powers':
-                        if(tier === 'easy') {
-                            num1 = Math.floor(Math.random() * 3) + 2;
-                        }
+                        num1 = Math.floor(Math.random() * 5) + 2;
                         answer = num1 * num1;
                         expr = `${num1}² = ?`;
                         wordProblem = `מהי התוצאה של המספר ${num1} בריבוע?`;
@@ -950,6 +955,9 @@
             return { generate };
         })();
 
+        /**
+         * 6. מנוע ניהול מהלך המשחק הפעיל (Game Engine Controller)
+         */
         const GameEngine = (() => {
             let state = {
                 tier: 'easy',
@@ -996,313 +1004,353 @@
                 state.correct = 0;
                 state.total = 0;
                 state.speedBonusTotal = 0;
-                state.buffer = "";
-                state.startTime = Date.now();
 
-                loadNextQuestion();
+                document.getElementById('live-score').innerText = "0";
+                document.getElementById('live-index').innerText = "1";
+
                 NavigationSystem.changeTab('game');
-                startGlobalTimer();
+                
+                if(state.mode === 'time') {
+                    startGlobalCountdown();
+                } else {
+                    document.getElementById('game-mode-status-text').innerText = `שאלה 1 מתוך ${state.qcount}`;
+                }
+
+                nextQuestion();
             };
 
-            const loadNextQuestion = () => {
+            const startGlobalCountdown = () => {
+                let left = state.duration;
+                const updateUi = () => {
+                    if(left <= 0) { 
+                        clearInterval(globalTimer);
+                        endSession(); 
+                        return; 
+                    }
+                    let m = Math.floor(left / 60); let s = left % 60;
+                    document.getElementById('game-mode-status-text').innerText = `זמן: ${m}:${s.toString().padStart(2, '0')}`;
+                };
+                updateUi();
+                globalTimer = setInterval(() => { left--; updateUi(); }, 1000);
+            };
+
+            const nextQuestion = () => {
+                // בדיקת תנאי סיום במוד שאלות קשיח לפני ייצור שאלה חדשה
+                if(state.mode === 'count' && state.total >= state.qcount) {
+                    endSession();
+                    return;
+                }
+
                 state.total++;
+                if (state.mode === 'count') {
+                    document.getElementById('game-mode-status-text').innerText = `שאלה ${state.total} מתוך ${state.qcount}`;
+                }
+                document.getElementById('live-index').innerText = state.total;
+                state.buffer = "";
+                document.getElementById('keypad-preview').innerText = "?";
+
                 const q = QuestionGenerator.generate(state.tier, state.selectedTopics);
                 state.currentAnswer = q.answer;
                 state.inputMethod = q.inputMethod;
+                state.startTime = Date.now();
 
                 document.getElementById('math-expression-node').innerHTML = q.expr;
-                const wordProblemEl = document.getElementById('word-problem-text');
+                const probNode = document.getElementById('word-problem-text');
                 if(q.wordProblem) {
-                    wordProblemEl.innerText = q.wordProblem;
-                    wordProblemEl.style.display = 'block';
+                    probNode.innerText = q.wordProblem;
+                    probNode.style.display = 'block';
                 } else {
-                    wordProblemEl.style.display = 'none';
+                    probNode.style.display = 'none';
                 }
 
-                document.getElementById('live-index').innerText = state.total;
-                state.buffer = "";
+                if(state.inputMethod === 'choice') {
+                    document.getElementById('panel-keypad').style.display = 'none';
+                    document.getElementById('panel-choices').style.display = 'grid';
+                    buildChoices(q.answer);
+                } else {
+                    document.getElementById('panel-choices').style.display = 'none';
+                    document.getElementById('panel-keypad').style.display = 'block';
+                }
+
+                if(state.total % 3 === 0) {
+                    DinoSystem.say("אתה פשוט אלוף! המשך ככה!", 'excited');
+                }
+
+                resetQuestionTimer();
+            };
+
+            const buildChoices = (ans) => {
+                const btns = document.querySelectorAll('#panel-choices .btn-choice');
+                let set = new Set();
+                set.add(ans);
+                while(set.size < 4) {
+                    let offset = Math.floor(Math.random() * 12) + 1;
+                    set.add(Math.random() > 0.5 ? ans + offset : Math.max(0, ans - offset));
+                }
+                let arr = Array.from(set).sort(() => Math.random() - 0.5);
+                btns.forEach((b, i) => b.innerText = arr[i]);
+            };
+
+            const resetQuestionTimer = () => {
+                clearInterval(questionTimer);
                 qTimeRemaining = 20;
-
-                renderInputMethod();
-            };
-
-            const renderInputMethod = () => {
-                const choicesPanel = document.getElementById('panel-choices');
-                const keypadPanel = document.getElementById('panel-keypad');
-
-                if (state.inputMethod === 'choice') {
-                    choicesPanel.style.display = 'grid';
-                    keypadPanel.style.display = 'none';
-
-                    let choices = [state.currentAnswer];
-                    while (choices.length < 4) {
-                        let fake = state.currentAnswer + Math.floor(Math.random() * 20) - 10;
-                        if (fake !== state.currentAnswer && !choices.includes(fake) && fake > 0) {
-                            choices.push(fake);
-                        }
-                    }
-                    choices.sort(() => Math.random() - 0.5);
-
-                    const buttons = document.querySelectorAll('.btn-choice');
-                    buttons.forEach((btn, idx) => {
-                        btn.innerText = choices[idx];
-                    });
-                } else {
-                    choicesPanel.style.display = 'none';
-                    keypadPanel.style.display = 'block';
-                    document.getElementById('keypad-preview').innerText = state.buffer || "?";
-                }
-            };
-
-            const startGlobalTimer = () => {
-                if (state.mode !== 'time') return;
-                let remaining = state.duration;
-                globalTimer = setInterval(() => {
-                    remaining--;
-                    const mins = Math.floor(remaining / 60);
-                    const secs = remaining % 60;
-                    document.getElementById('game-mode-status-text').innerText =
-                        `נותר זמן: ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-
-                    if (remaining <= 0) {
-                        clearInterval(globalTimer);
-                        endSession();
-                    }
-                }, 1000);
-            };
-
-            const submitAnswer = (ansStr) => {
-                const ans = parseInt(ansStr);
-                if (ans === state.currentAnswer) {
-                    state.correct++;
-                    const speedBonus = Math.max(0, qTimeRemaining - 5);
-                    state.speedBonusTotal += speedBonus;
-                    state.score += 10 + speedBonus;
-                    SoundManager.playSuccess();
-                    showFeedback(true, state.currentAnswer);
-                } else {
-                    SoundManager.playError();
-                    showFeedback(false, state.currentAnswer, ans);
-                }
-                setTimeout(() => {
-                    if (state.mode === 'count' && state.total >= state.qcount) {
-                        endSession();
-                    } else {
-                        loadNextQuestion();
-                    }
-                }, 1500);
+                const bar = document.getElementById('q-timer-bar');
+                questionTimer = setInterval(() => {
+                    qTimeRemaining -= 0.1;
+                    bar.style.width = `${(qTimeRemaining / 20) * 100}%`;
+                    if(qTimeRemaining <= 0) { clearInterval(questionTimer); resolveAnswer(false, true); }
+                }, 100);
             };
 
             const pressKey = (key) => {
                 SoundManager.playClick();
-                if (key === 'clear') {
-                    state.buffer = "";
-                } else if (key === 'enter') {
-                    submitAnswer(state.buffer || "0");
-                    return;
-                } else {
-                    if (state.buffer.length < 4) state.buffer += key;
-                }
+                if(key === 'clear') state.buffer = "";
+                else if(key === 'enter') { if(state.buffer) submitAnswer(state.buffer); return; }
+                else { if(state.buffer.length < 5) state.buffer += key; }
                 document.getElementById('keypad-preview').innerText = state.buffer || "?";
             };
 
-            const showFeedback = (isCorrect, correctAns, userAns = null) => {
-                const panel = document.getElementById('feedback-panel');
-                const dinoNode = document.getElementById('feedback-dino-node');
-                const stateNode = document.getElementById('feedback-state');
-                const msgNode = document.getElementById('feedback-msg');
-                const bonusContainer = document.getElementById('feedback-bonus-container');
+            const submitAnswer = (val) => {
+                clearInterval(questionTimer);
+                resolveAnswer(parseInt(val) === state.currentAnswer, false);
+            };
 
-                if (isCorrect) {
-                    dinoNode.innerText = '🦖';
-                    stateNode.innerText = 'נכון! 🎉';
-                    stateNode.style.color = '#4CAF50';
-                    msgNode.innerText = 'אתה מחלומות!';
-                    bonusContainer.innerHTML = '';
+            const resolveAnswer = (isCorrect, isTimeout = false) => {
+                const panel = document.getElementById('feedback-panel');
+                panel.style.display = 'flex';
+                document.getElementById('feedback-solution').innerText = `התשובה הנכונה היא: ${state.currentAnswer}`;
+                
+                const bonusNode = document.getElementById('feedback-bonus-container');
+                bonusNode.innerHTML = "";
+
+                const db = Database.get();
+
+                if(isCorrect) {
+                    SoundManager.playSuccess();
+                    state.correct++;
+                    db.streak++;
+                    
+                    let elapsed = (Date.now() - state.startTime) / 1000;
+                    let speedBonus = 0;
+                    if(elapsed < 5) speedBonus = 15;
+                    else if(elapsed < 10) speedBonus = 10;
+                    else if(elapsed < 15) speedBonus = 5;
+
+                    state.speedBonusTotal += speedBonus;
+                    state.score += (10 + speedBonus);
+                    document.getElementById('live-score').innerText = state.score;
+
+                    db.stars += 1;
+                    db.coins += (speedBonus > 0) ? 6 : 3;
+
+                    document.getElementById('feedback-dino-node').innerText = "🦕";
+                    document.getElementById('feedback-state').innerText = "תשובה נכונה! אלוף!";
+                    document.getElementById('feedback-state').style.color = "var(--primary-green)";
+                    
+                    const pool = ["מדהים ביותר!", "דקסטר רוקד מאושר!", "כל הכבוד חבר!"];
+                    document.getElementById('feedback-msg').innerText = pool[Math.floor(Math.random() * pool.length)];
+
+                    if(speedBonus > 0) {
+                        bonusNode.innerHTML = `<div class="bonus-badge">⚡ מהירות דינוזאורית! +${speedBonus} נק'</div>`;
+                    }
                 } else {
-                    dinoNode.innerText = '🐢';
-                    stateNode.innerText = 'לא בדיוק...';
-                    stateNode.style.color = '#E91E63';
-                    msgNode.innerText = `התשובה הנכונה היא ${correctAns}`;
-                    bonusContainer.innerHTML = '';
+                    SoundManager.playError();
+                    db.streak = 0;
+                    document.getElementById('feedback-dino-node').innerText = "🐢";
+                    document.getElementById('feedback-state').innerText = isTimeout ? "נגמר הזמן! ⏳" : "טעות קטנה, לא נורא!";
+                    document.getElementById('feedback-state').style.color = "var(--accent-red)";
+                    document.getElementById('feedback-msg').innerText = "כל טעות עוזרת לנו ללמוד ולהשתפר!";
                 }
 
-                panel.style.display = 'flex';
-                setTimeout(() => { panel.style.display = 'none'; }, 1200);
+                Database.save();
+                setTimeout(() => { panel.style.display = 'none'; nextQuestion(); }, 2500);
             };
 
             const endSession = () => {
-                if (globalTimer) clearInterval(globalTimer);
-                const db = Database.get();
-                const acc = Math.round((state.correct / state.total) * 100) || 0;
-                const stars = acc >= 80 ? 3 : acc >= 60 ? 2 : acc >= 40 ? 1 : 0;
-                const coins = state.correct * 5;
+                clearInterval(globalTimer);
+                clearInterval(questionTimer);
 
+                const db = Database.get();
                 db.totalGames++;
                 db.totalQuestions += state.total;
                 db.totalCorrect += state.correct;
-                db.durationSpent += (Date.now() - state.startTime) / 1000;
-                db.coins += coins;
-                db.stars += stars;
-                if (state.score > db.highScore) db.highScore = state.score;
+                db.durationSpent += (state.mode === 'time') ? state.duration : (state.total * 6);
 
+                let currentWeek = Math.floor((new Date().getDate() - 1) / 7) % 4;
+                db.weeklyProgress[currentWeek] += state.correct;
+
+                let isNewRecord = false;
+                if(state.score > db.highScore) { db.highScore = state.score; isNewRecord = true; }
+
+                checkBadges(db, state);
                 Database.save();
 
+                // רינדור נתונים למסך סיום
                 document.getElementById('r-score').innerText = state.score;
-                document.getElementById('r-acc').innerText = acc + '%';
-                document.getElementById('r-stars').innerText = stars;
-                document.getElementById('r-coins').innerText = coins;
+                document.getElementById('r-stars').innerText = state.correct;
+                document.getElementById('r-coins').innerText = state.correct * 3;
                 document.getElementById('r-good').innerText = state.correct;
                 document.getElementById('r-bad').innerText = state.total - state.correct;
                 document.getElementById('r-speedbonus').innerText = state.speedBonusTotal;
+                
+                let acc = state.total > 0 ? Math.round((state.correct / state.total) * 100) : 0;
+                document.getElementById('r-acc').innerText = `${acc}%`;
+
+                const recHolder = document.getElementById('r-records-holder');
+                if(isNewRecord) {
+                    recHolder.style.display = 'block';
+                    recHolder.innerHTML = `<div class="bonus-badge" style="background:#4CAF50;">👑 שברת את שיא הנקודות האישי!</div>`;
+                } else { recHolder.style.display = 'none'; }
 
                 NavigationSystem.changeTab('results');
+                DinoSystem.say("הגעת לקו הסיום! סיכום התוצאות פתוח בפניך.", 'excited');
+
+                // מנגנון ניתוב מחדש אוטומטי למסך הבית (6 שניות בדיוק)
+                let countdownLeft = 6;
+                const cBox = document.getElementById('redirect-countdown-msg');
+                cBox.innerText = `העברה אוטומטית למסך הבית בעוד ${countdownLeft} שניות...`;
+                
                 redirectTimer = setInterval(() => {
-                    let countDown = 6;
-                    setInterval(() => {
-                        if (countDown <= 0) {
-                            NavigationSystem.changeTab('home');
-                            clearInterval(redirectTimer);
-                        } else {
-                            document.getElementById('redirect-countdown-msg').innerText =
-                                `העברה אוטומטית למסך הבית בעוד ${countDown} שניות...`;
-                            countDown--;
-                        }
-                    }, 1000);
-                }, 100);
+                    countdownLeft--;
+                    if (countdownLeft <= 0) {
+                        clearInterval(redirectTimer);
+                        NavigationSystem.changeTab('home');
+                    } else {
+                        cBox.innerText = `העברה אוטומטית למסך הבית בעוד ${countdownLeft} שניות...`;
+                    }
+                }, 1000);
+            };
+
+            const checkBadges = (db, state) => {
+                const badges = db.unlockedBadges;
+                if(db.streak >= 10 && !badges.includes('streak_10')) { badges.push('streak_10'); showToast("🏆 השגת תואר: שובר שיאים!"); }
+                if(db.totalQuestions >= 50 && !badges.includes('sol_50')) { badges.push('sol_50'); showToast("🏆 השגת תואר: אלוף החיסור!"); }
+                if(db.totalQuestions >= 100 && !badges.includes('sol_100')) { badges.push('sol_100'); showToast("🏆 השגת תואר: מאסטר החשבון!"); }
+                if(state.correct === state.total && state.total >= 10 && !badges.includes('perfect')) { badges.push('perfect'); showToast("🏆 השגת תואר: מלך החיבור!"); }
             };
 
             const exitEarly = () => {
-                if (confirm("רוצה לצאת מהמשחק? נתונים לא יישמרו!")) {
-                    if (globalTimer) clearInterval(globalTimer);
+                if(confirm("לברוח באמצע המשחק? כל הנקודות של הסיבוב הנוכחי ילכו לאיבוד.")) {
+                    clearInterval(globalTimer); clearInterval(questionTimer);
                     NavigationSystem.changeTab('home');
                 }
             };
 
-            return { startSession, submitAnswer, pressKey, exitEarly, loadNextQuestion, renderInputMethod };
+            return { startSession, submitAnswer, pressKey, exitEarly, state };
         })();
 
-        const TopicSystem = (() => {
-            const topics = [
-                { key: 'add', label: 'חיבור ➕' },
-                { key: 'sub', label: 'חיסור ➖' },
-                { key: 'mul', label: 'כפל ✖️' },
-                { key: 'div', label: 'חילוק ➗' },
-                { key: 'fractions', label: 'שברים 📊' },
-                { key: 'percentages', label: 'אחוזים 🎯' },
-                { key: 'geometry', label: 'גיאומטריה 📐' },
-                { key: 'circle', label: 'עיגול ⭕' },
-                { key: 'variables', label: 'משתנים ❓' },
-                { key: 'powers', label: 'חזקות ⚡' },
-                { key: 'word_problems', label: 'בעיות מילוליות 📖' }
-            ];
+        /**
+         * 7. רשימת הגדרות נושאים מובנית מבוססת רמות קושי
+         */
+        const TOPICS_POOL = {
+            easy: [ {id:'add', name:'חיבור ➕'}, {id:'sub', name:'חיסור ➖'}, {id:'mul', name:'כפל ✖️'}, {id:'word_problems', name:'בעיות מילוליות 💬'} ],
+            medium: [ {id:'add', name:'חיבור ➕'}, {id:'sub', name:'חיסור ➖'}, {id:'mul', name:'כפל ✖️'}, {id:'div', name:'חילוק ➗'}, {id:'fractions', name:'שברים 📊'}, {id:'word_problems', name:'בעיות מילוליות 💬'} ],
+            hard: [ {id:'add', name:'חיבור'}, {id:'sub', name:'חיסור'}, {id:'mul', name:'כפל'}, {id:'div', name:'חילוק'}, {id:'geometry', name:'היקף ושטח 📐'}, {id:'percentages', name:'אחוזים ％'}, {id:'fractions', name:'שברים'}, {id:'circle', name:'מעגל ופאי ⭕'}, {id:'word_problems', name:'בעיות מילוליות'} ],
+            master: [ {id:'mul', name:'כפל'}, {id:'div', name:'חילוק'}, {id:'circle', name:'מעגל ופאי ⭕'}, {id:'variables', name:'נעלמים (X) ❓'}, {id:'powers', name:'חזקות ⚡'}, {id:'percentages', name:'אחוזים'}, {id:'fractions', name:'שברים'}, {id:'geometry', name:'שטח והיקף'}, {id:'word_problems', name:'בעיות מילוליות'} ]
+        };
 
-            const renderTopics = () => {
-                const container = document.getElementById('topics-selection-box');
-                container.innerHTML = '';
-                topics.forEach(t => {
-                    const box = document.createElement('div');
-                    box.className = 'toggle-box topic-box selected-box';
-                    box.setAttribute('data-value', t.key);
-                    box.innerText = t.label;
-                    box.onclick = () => {
-                        box.classList.toggle('selected-box');
-                    };
-                    container.appendChild(box);
-                });
-            };
+        function renderTopicsForTier(tierId) {
+            const container = document.getElementById('topics-selection-box');
+            container.innerHTML = "";
+            const list = TOPICS_POOL[tierId] || TOPICS_POOL.easy;
+            list.forEach((top, index) => {
+                const box = document.createElement('div');
+                box.className = `toggle-box topic-box ${index === 0 ? 'selected-box' : ''}`;
+                box.setAttribute('data-value', top.id);
+                box.innerText = top.name;
+                box.onclick = function() {
+                    SoundManager.playClick();
+                    this.classList.toggle('selected-box');
+                };
+                container.appendChild(box);
+            });
+        }
 
-            return { renderTopics };
-        })();
+        function toggleSelectAllTopics() {
+            SoundManager.playClick();
+            document.querySelectorAll('#topics-selection-box .topic-box').forEach(b => b.classList.add('selected-box'));
+        }
 
-        const updateHUDBanner = () => {
+        /**
+         * 8. רינדור דשבורד חזותי
+         */
+        const BADGES_DEFS = [
+            { id: 'streak_10', title: '🥇 שובר שיאים', desc: '10 תשובות נכונות ברצף' },
+            { id: 'sol_50', title: '🥈 אלוף החיסור', desc: 'פתרת 50 שאלות באפליקציה' },
+            { id: 'sol_100', title: '👑 מאסטר החשבון', desc: 'פתרת 100 שאלות היסטוריות' },
+            { id: 'perfect', title: '🏆 מלך החיבור', desc: 'משחק מושלם שלם ללא שגיאות' }
+        ];
+
+        function renderStatsDashboard() {
+            const db = Database.get();
+            document.getElementById('s-games').innerText = db.totalGames;
+            document.getElementById('s-questions').innerText = db.totalQuestions;
+            document.getElementById('s-high').innerText = db.highScore;
+            document.getElementById('s-coins').innerText = db.coins;
+
+            let acc = db.totalQuestions > 0 ? Math.round((db.totalCorrect / db.totalQuestions) * 100) : 0;
+            document.getElementById('s-acc').innerText = `${acc}%`;
+
+            let avg = db.totalQuestions > 0 ? (db.durationSpent / db.totalQuestions).toFixed(1) : 0;
+            document.getElementById('s-time').innerText = `${avg} ש'`;
+
+            const listNode = document.getElementById('achievements-list');
+            listNode.innerHTML = "";
+            BADGES_DEFS.forEach(b => {
+                const unlocked = db.unlockedBadges.includes(b.id);
+                const row = document.createElement('div');
+                row.className = `achievement-row ${unlocked ? 'unlocked' : ''}`;
+                row.innerHTML = `
+                    <div style="font-size:1.5rem;">${unlocked ? '⭐' : '🔒'}</div>
+                    <div><strong>${b.title}</strong><br><small>${b.desc}</small></div>
+                `;
+                listNode.appendChild(row);
+            });
+
+            const max = Math.max(...db.weeklyProgress, 1);
+            document.getElementById('bar-w1').style.height = `${(db.weeklyProgress[0] / max) * 80 + 10}%`;
+            document.getElementById('bar-w2').style.height = `${(db.weeklyProgress[1] / max) * 80 + 10}%`;
+            document.getElementById('bar-w3').style.height = `${(db.weeklyProgress[2] / max) * 80 + 10}%`;
+            document.getElementById('bar-w4').style.height = `${(db.weeklyProgress[3] / max) * 80 + 10}%`;
+        }
+
+        function updateHUDBanner() {
             const db = Database.get();
             document.getElementById('hud-stars').innerText = db.stars;
             document.getElementById('hud-coins').innerText = db.coins;
             document.getElementById('hud-streak').innerText = db.streak;
-        };
+        }
 
-        const renderStatsDashboard = () => {
-            const db = Database.get();
-            const avgTime = db.totalQuestions > 0 ? (db.durationSpent / db.totalQuestions).toFixed(1) : 0;
-            const generalAcc = db.totalQuestions > 0 ? Math.round((db.totalCorrect / db.totalQuestions) * 100) : 0;
+        function showToast(text) {
+            const el = document.getElementById('toast-alert');
+            el.innerText = text; el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3500);
+        }
 
-            document.getElementById('s-games').innerText = db.totalGames;
-            document.getElementById('s-questions').innerText = db.totalQuestions;
-            document.getElementById('s-acc').innerText = generalAcc + '%';
-            document.getElementById('s-time').innerText = avgTime + ' ש\'';
-            document.getElementById('s-high').innerText = db.highScore;
-            document.getElementById('s-coins').innerText = db.coins;
-
-            const badges = [
-                { icon: '🌟', text: 'מתחיל חדש - 1 משחק' },
-                { icon: '🎯', text: 'דיוק מושלם - 100% סיבוב אחד' },
-                { icon: '⭐', text: 'כוכב זוהר - 50 כוכבים' },
-                { icon: '🏆', text: 'אלוף המתמטיקה - 1000 נקודות' },
-                { icon: '🔥', text: 'רצף של 10 נכונות' }
-            ];
-
-            const achievementsBox = document.getElementById('achievements-list');
-            achievementsBox.innerHTML = '';
-            badges.forEach((badge, idx) => {
-                const row = document.createElement('div');
-                row.className = 'achievement-row';
-                const shouldUnlock = (idx === 0 && db.totalGames > 0) ||
-                                    (idx === 1 && generalAcc === 100) ||
-                                    (idx === 2 && db.stars >= 50) ||
-                                    (idx === 3 && db.highScore >= 1000) ||
-                                    (idx === 4 && db.streak >= 10);
-                if (shouldUnlock) row.classList.add('unlocked');
-                row.innerText = `${badge.icon} ${badge.text}`;
-                achievementsBox.appendChild(row);
-            });
-
-            const weeks = [25, 42, 15, 8];
-            weeks.forEach((val, i) => {
-                const bar = document.getElementById(`bar-w${i+1}`);
-                bar.style.height = (Math.min(val, 100)) + '%';
-            });
-        };
-
-        const toggleSelectAllTopics = () => {
-            const boxes = document.querySelectorAll('.topic-box');
-            const allSelected = Array.from(boxes).every(b => b.classList.contains('selected-box'));
-            boxes.forEach(b => {
-                b.classList[allSelected ? 'remove' : 'add']('selected-box');
-            });
-        };
-
-        (() => {
+        document.addEventListener("DOMContentLoaded", () => {
             Database.load();
             updateHUDBanner();
-            TopicSystem.renderTopics();
-            SoundManager.startAmbientMusic();
+            renderTopicsForTier('easy');
 
-            document.querySelectorAll('[data-type="mode"]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('[data-type="mode"]').forEach(b => b.classList.remove('selected-box'));
-                    this.classList.add('selected-box');
-                    const isTiming = this.getAttribute('data-value') === 'time';
-                    document.getElementById('time-options-container').style.display = isTiming ? 'block' : 'none';
-                    document.getElementById('count-options-container').style.display = isTiming ? 'none' : 'block';
-                });
-            });
-
-            document.querySelectorAll('[data-type="tier"]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('[data-type="tier"]').forEach(b => b.classList.remove('selected-box'));
-                    this.classList.add('selected-box');
-                });
-            });
-
-            document.querySelectorAll('[data-type="duration"], [data-type="qcount"]').forEach(btn => {
-                btn.addEventListener('click', function() {
+            document.querySelectorAll('.toggle-box').forEach(box => {
+                box.addEventListener('click', function() {
                     const type = this.getAttribute('data-type');
+                    if(!type || type === 'topic') return;
+                    
                     document.querySelectorAll(`[data-type="${type}"]`).forEach(b => b.classList.remove('selected-box'));
                     this.classList.add('selected-box');
+
+                    if(type === 'tier') {
+                        renderTopicsForTier(this.getAttribute('data-value'));
+                    }
+                    if(type === 'mode') {
+                        const val = this.getAttribute('data-value');
+                        document.getElementById('time-options-container').style.display = (val === 'time') ? 'block' : 'none';
+                        document.getElementById('count-options-container').style.display = (val === 'count') ? 'block' : 'none';
+                    }
                 });
             });
-        })();
+        });
     </script>
 </body>
 </html>
